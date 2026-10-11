@@ -76,6 +76,8 @@ export function levelToShareable(
       t: station.title,
       a: station.task,
       ...(station.hint ? { h: station.hint } : {}),
+      ...(station.answer ? { r: station.answer } : {}),
+      ...(station.answers?.length ? { v: station.answers } : {}),
     })),
   };
 }

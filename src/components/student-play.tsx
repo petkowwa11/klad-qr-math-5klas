@@ -5,11 +5,15 @@ import { useSearchParams } from "next/navigation";
 import { BrandMark, StatusBlock } from "@/components/site-chrome";
 import { LinkButton } from "@/components/link-button";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { checkAnswer } from "@/lib/answers";
 import { resolvePlayPayload } from "@/lib/curriculum/catalog";
 import {
   decodeHunt,
   loadProgress,
   markStationDone,
+  MAX_WRONG_BEFORE_REVEAL,
+  stationAcceptedAnswers,
   type ShareableHunt,
 } from "@/lib/hunt";
 import { CheckCircle2, ChevronRight, Lightbulb, MapPinned } from "lucide-react";
@@ -22,7 +26,11 @@ export function StudentPlay() {
   const [loading, setLoading] = useState(true);
   const [hintOpen, setHintOpen] = useState(false);
   const [done, setDone] = useState<number[]>([]);
-  const [justCompleted, setJustCompleted] = useState(false);
+  const [answer, setAnswer] = useState("");
+  const [wrongTries, setWrongTries] = useState(0);
+  const [feedback, setFeedback] = useState<"idle" | "correct" | "wrong">("idle");
+  const [revealed, setRevealed] = useState(false);
+  const previewMode = searchParams.get("preview") === "1";
 
   const encoded = searchParams.get("d") ?? "";
   const catalogId = searchParams.get("c") ?? "";
@@ -37,14 +45,18 @@ export function StudentPlay() {
     } else if (encoded) {
       params.set("d", encoded);
     }
+    if (previewMode) params.set("preview", "1");
     params.set("n", String(index + 1));
     return `/play?${params.toString()}`;
-  }, [catalogId, encoded, index, levelId]);
+  }, [catalogId, encoded, index, levelId, previewMode]);
 
   useEffect(() => {
     setLoading(true);
     setHintOpen(false);
-    setJustCompleted(false);
+    setAnswer("");
+    setWrongTries(0);
+    setFeedback("idle");
+    setRevealed(false);
     const fromCatalog = resolvePlayPayload({
       c: catalogId,
       lv: levelId,
@@ -72,18 +84,36 @@ export function StudentPlay() {
   }, [catalogId, encoded, levelId, rawIndex]);
 
   const station = hunt?.s[index];
+  const accepted = station ? stationAcceptedAnswers(station) : [];
   const isLast = hunt ? index >= hunt.s.length - 1 : true;
-  const completedHere = done.includes(index);
+  const completedHere = done.includes(index) || feedback === "correct";
+  const canReveal = wrongTries >= MAX_WRONG_BEFORE_REVEAL || hintOpen;
   const progressLabel = useMemo(() => {
     if (!hunt) return "";
-    return `${done.length} / ${hunt.s.length} станции`;
-  }, [done.length, hunt]);
+    const count = new Set([...done, ...(feedback === "correct" ? [index] : [])]).size;
+    return `${count} / ${hunt.s.length} станции`;
+  }, [done, feedback, hunt, index]);
 
-  function completeStation() {
-    if (!hunt) return;
-    const next = markStationDone(hunt.t, index);
-    setDone(next);
-    setJustCompleted(true);
+  function submitAnswer() {
+    if (!hunt || !station) return;
+    if (accepted.length === 0) {
+      setFeedback("wrong");
+      return;
+    }
+    if (checkAnswer(answer, accepted)) {
+      setFeedback("correct");
+      setDone(markStationDone(hunt.t, index));
+      setRevealed(false);
+      return;
+    }
+    setFeedback("wrong");
+    setWrongTries((n) => n + 1);
+  }
+
+  function previewSkip() {
+    if (!hunt || !previewMode) return;
+    setFeedback("correct");
+    setDone(markStationDone(hunt.t, index));
   }
 
   if (loading) {
@@ -171,26 +201,87 @@ export function StudentPlay() {
           ) : null}
 
           <section className="mt-8 space-y-3">
-            {!completedHere && !justCompleted ? (
-              <Button
-                type="button"
-                size="lg"
-                className="h-12 w-full text-base"
-                onClick={completeStation}
-              >
-                <CheckCircle2 data-icon="inline-start" />
-                Маркирай като решена
-              </Button>
+            {!completedHere ? (
+              <>
+                <label className="block text-sm font-semibold text-foreground/80" htmlFor="answer">
+                  Твоят отговор
+                </label>
+                <Input
+                  id="answer"
+                  value={answer}
+                  onChange={(e) => {
+                    setAnswer(e.target.value);
+                    if (feedback !== "idle") setFeedback("idle");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") submitAnswer();
+                  }}
+                  placeholder="Напр. 3/4 или 0,75"
+                  className="h-12 bg-background text-base"
+                  autoComplete="off"
+                  inputMode="text"
+                />
+                <Button
+                  type="button"
+                  size="lg"
+                  className="h-12 w-full text-base"
+                  onClick={submitAnswer}
+                  disabled={!answer.trim()}
+                >
+                  <CheckCircle2 data-icon="inline-start" />
+                  Провери
+                </Button>
+
+                {feedback === "wrong" ? (
+                  <div className="animate-hint-reveal rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+                    Още не — опитай пак. {wrongTries > 0 ? `(опит ${wrongTries})` : null}
+                    {canReveal && accepted[0] ? (
+                      <div className="mt-2">
+                        {!revealed ? (
+                          <button
+                            type="button"
+                            className="font-medium underline underline-offset-2"
+                            onClick={() => setRevealed(true)}
+                          >
+                            Покажи верния отговор
+                          </button>
+                        ) : (
+                          <p className="text-foreground">
+                            Верен отговор: <span className="font-semibold">{accepted[0]}</span>
+                          </p>
+                        )}
+                      </div>
+                    ) : wrongTries > 0 && wrongTries < MAX_WRONG_BEFORE_REVEAL ? (
+                      <p className="mt-1 text-destructive/80">
+                        След {MAX_WRONG_BEFORE_REVEAL - wrongTries} грешни опита можеш да разкриеш
+                        отговора.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {previewMode ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-muted-foreground"
+                    onClick={previewSkip}
+                  >
+                    Преглед: отбележи като решена
+                  </Button>
+                ) : null}
+              </>
             ) : (
               <div className="animate-hint-reveal rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3 text-sm text-forest">
-                Браво! Станцията е отбелязана.{" "}
+                Вярно! Съкровището на тази станция е твое.
                 {isLast
-                  ? "Стигна до съкровището на маршрута."
-                  : "Продължи към следващата станция."}
+                  ? " Стигна до края на маршрута."
+                  : " Продължи към следващата станция."}
               </div>
             )}
 
-            {!isLast ? (
+            {completedHere && !isLast ? (
               <LinkButton
                 href={nextHref}
                 size="lg"
@@ -200,7 +291,9 @@ export function StudentPlay() {
                 Към следващата станция
                 <ChevronRight data-icon="inline-end" />
               </LinkButton>
-            ) : completedHere || justCompleted ? (
+            ) : null}
+
+            {completedHere && isLast ? (
               <div className="rounded-2xl bg-forest px-4 py-5 text-center text-parchment">
                 <p className="font-display text-2xl font-semibold">Съкровището е твое</p>
                 <p className="mt-2 text-sm text-parchment/80">

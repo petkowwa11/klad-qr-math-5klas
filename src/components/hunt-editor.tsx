@@ -125,9 +125,11 @@ export function HuntEditor({
       setError("Добави поне една станция, преди да запазиш.");
       return;
     }
-    const incomplete = hunt.stations.some((s) => !s.title.trim() || !s.task.trim());
+    const incomplete = hunt.stations.some(
+      (s) => !s.title.trim() || !s.task.trim() || !s.answer.trim(),
+    );
     if (incomplete) {
-      setError("Всяка станция трябва да има заглавие и задача.");
+      setError("Всяка станция трябва да има заглавие, задача и верен отговор.");
       return;
     }
     setError(null);
@@ -340,6 +342,39 @@ export function HuntEditor({
                           />
                         </div>
                         <div className="space-y-2">
+                          <Label htmlFor={`st-answer-${station.id}`}>
+                            Верен отговор
+                          </Label>
+                          <Input
+                            id={`st-answer-${station.id}`}
+                            value={station.answer}
+                            onChange={(e) =>
+                              updateStation(station.id, { answer: e.target.value })
+                            }
+                            placeholder="Напр. 3/4"
+                            className="bg-background"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`st-answers-${station.id}`}>
+                            Приети варианти (по желание, разделени със запетая)
+                          </Label>
+                          <Input
+                            id={`st-answers-${station.id}`}
+                            value={(station.answers ?? []).join(", ")}
+                            onChange={(e) =>
+                              updateStation(station.id, {
+                                answers: e.target.value
+                                  .split(",")
+                                  .map((part) => part.trim())
+                                  .filter(Boolean),
+                              })
+                            }
+                            placeholder="Напр. 0,75, 0.75"
+                            className="bg-background"
+                          />
+                        </div>
+                        <div className="space-y-2">
                           <Label htmlFor={`st-hint-${station.id}`}>
                             Подсказка (по желание)
                           </Label>
@@ -424,7 +459,7 @@ export function HuntEditor({
               </div>
               {encoded && stations.length > 0 ? (
                 <LinkButton
-                  href={`/play?d=${encodeURIComponent(encoded)}&n=0`}
+                  href={`/play?d=${encodeURIComponent(encoded)}&n=0&preview=1`}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -442,7 +477,7 @@ export function HuntEditor({
                 </div>
                 <iframe
                   title="Преглед за ученик"
-                  src={`/play?d=${encodeURIComponent(encoded)}&n=0`}
+                  src={`/play?d=${encodeURIComponent(encoded)}&n=0&preview=1`}
                   className="h-[70vh] w-full bg-background"
                 />
               </div>

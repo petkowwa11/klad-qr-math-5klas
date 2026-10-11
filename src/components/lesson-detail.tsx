@@ -70,10 +70,10 @@ export function LessonDetail({
       <AppHeader
         action={
           <LinkButton
-            href={catalogPlayUrl(origin || "http://127.0.0.1:3847", lesson.id, levelId, 0)}
+            href={`${catalogPlayUrl(origin || "http://127.0.0.1:3847", lesson.id, levelId, 0)}&preview=1`}
             size="sm"
           >
-            Старт за ученик
+            Преглед за учител
           </LinkButton>
         }
       />
@@ -193,8 +193,18 @@ export function LessonDetail({
                 <p className="mt-3 whitespace-pre-wrap text-foreground">
                   {station.task}
                 </p>
+                <p className="mt-3 text-sm text-foreground/80">
+                  Отговор:{" "}
+                  <span className="font-semibold text-forest">{station.answer}</span>
+                  {station.answers?.length ? (
+                    <span className="text-muted-foreground">
+                      {" "}
+                      (още: {station.answers.join(", ")})
+                    </span>
+                  ) : null}
+                </p>
                 {station.hint ? (
-                  <p className="mt-3 text-sm text-muted-foreground">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     Подсказка: {station.hint}
                   </p>
                 ) : null}

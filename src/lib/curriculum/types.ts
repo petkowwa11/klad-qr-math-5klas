@@ -5,6 +5,10 @@ export type CurriculumStation = {
   title: string;
   task: string;
   hint: string;
+  /** Primary expected answer (Bulgarian math formats OK). */
+  answer: string;
+  /** Optional accepted variants. */
+  answers?: string[];
 };
 
 export type LessonLevel = {
