@@ -193,24 +193,36 @@ export function HuntEditor({
           </div>
         ) : null}
 
-        <div className="no-print mt-8 flex flex-wrap gap-2 border-b border-border pb-3">
+        <div
+          className="no-print mt-8 flex flex-wrap gap-2 border-b border-border pb-3"
+          role="tablist"
+          aria-label="Изгледи за лова"
+        >
           {(
             [
               ["edit", "Станции"],
               ["qr", "QR лист"],
               ["preview", "Преглед за ученик"],
             ] as const
-          ).map(([key, label]) => (
-            <Button
-              key={key}
-              type="button"
-              size="sm"
-              variant={tab === key ? "default" : "ghost"}
-              onClick={() => setTab(key)}
-            >
-              {label}
-            </Button>
-          ))}
+          ).map(([key, label]) => {
+            const active = tab === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`inline-flex h-8 items-center rounded-lg px-3 text-sm font-medium transition ${
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground/80 hover:bg-muted"
+                }`}
+                onClick={() => setTab(key)}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
 
         {tab === "edit" ? (

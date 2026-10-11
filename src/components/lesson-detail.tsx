@@ -136,23 +136,35 @@ export function LessonDetail({
           })}
         </div>
 
-        <div className="no-print mt-8 flex flex-wrap gap-2 border-b border-border pb-3">
-          <Button
-            type="button"
-            size="sm"
-            variant={tab === "stations" ? "default" : "ghost"}
-            onClick={() => setTab("stations")}
-          >
-            Станции
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant={tab === "qr" ? "default" : "ghost"}
-            onClick={() => setTab("qr")}
-          >
-            QR лист
-          </Button>
+        <div
+          className="no-print mt-8 flex flex-wrap items-center gap-2 border-b border-border pb-3"
+          role="tablist"
+          aria-label="Изгледи за урока"
+        >
+          {(
+            [
+              ["stations", "Станции"],
+              ["qr", "QR лист"],
+            ] as const
+          ).map(([key, label]) => {
+            const active = tab === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`inline-flex h-8 items-center rounded-lg px-3 text-sm font-medium transition ${
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground/80 hover:bg-muted"
+                }`}
+                onClick={() => setTab(key)}
+              >
+                {label}
+              </button>
+            );
+          })}
           <LinkButton
             href={catalogPlayUrl(origin || "http://127.0.0.1:3847", lesson.id, levelId, 0)}
             size="sm"
