@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a2f2c"/>
+      <stop offset="45%" stop-color="#134842"/>
+      <stop offset="100%" stop-color="#1d5c4f"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0.2" y1="0.1" x2="0.9" y2="0.9">
+      <stop offset="0%" stop-color="#f0c14b" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#f0c14b" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" stroke="#e8dcc4" stroke-opacity="0.06"/>
+    </pattern>
+  </defs>
+  <rect width="1440" height="900" fill="url(#sky)"/>
+  <rect width="1440" height="900" fill="url(#grid)"/>
+  <ellipse cx="1120" cy="220" rx="280" ry="180" fill="url(#glow)"/>
+  <path d="M120 640C280 520 360 700 520 560C680 420 760 640 920 500C1040 400 1140 460 1280 360" stroke="#e8dcc4" stroke-opacity="0.35" stroke-width="3" stroke-dasharray="14 12" stroke-linecap="round"/>
+  <circle cx="120" cy="640" r="10" fill="#f0c14b"/>
+  <circle cx="520" cy="560" r="10" fill="#f0c14b"/>
+  <circle cx="920" cy="500" r="10" fill="#f0c14b"/>
+  <circle cx="1280" cy="360" r="14" fill="#f0c14b"/>
+  <path d="M1260 330l20-36 20 36h-40z" fill="#f0c14b"/>
+  <path d="M180 210c40-60 120-60 160 0 40 60 0 140-80 180-80-40-120-120-80-180z" fill="#0f3d37" fill-opacity="0.55"/>
+  <path d="M980 680c50-70 150-70 200 0 50 70 0 170-100 220-100-50-150-150-100-220z" fill="#0f3d37" fill-opacity="0.4"/>
+  <g stroke="#e8dcc4" stroke-opacity="0.18" stroke-width="1.5">
+    <path d="M240 120h80M280 80v80"/>
+    <circle cx="280" cy="120" r="28"/>
+  </g>
+</svg>
