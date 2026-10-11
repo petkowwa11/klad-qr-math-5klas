@@ -52,43 +52,44 @@
 }
 
 :root {
-  --background: #f4efe3;
-  --foreground: #142824;
-  --card: #fffaf0;
-  --card-foreground: #142824;
-  --popover: #fffaf0;
-  --popover-foreground: #142824;
+  /* Cool sage paper — forest brand, not warm cream/terracotta */
+  --background: #e9f0ec;
+  --foreground: #122824;
+  --card: #f5faf7;
+  --card-foreground: #122824;
+  --popover: #f5faf7;
+  --popover-foreground: #122824;
   --primary: #145248;
-  --primary-foreground: #f7f1e4;
-  --secondary: #e4d8c0;
-  --secondary-foreground: #1a332e;
-  --muted: #ebe2d0;
-  --muted-foreground: #4d635c;
-  --accent: #d9c9a3;
-  --accent-foreground: #1a332e;
+  --primary-foreground: #eef7f2;
+  --secondary: #d5e4dc;
+  --secondary-foreground: #16332d;
+  --muted: #dce8e1;
+  --muted-foreground: #456058;
+  --accent: #cfe0d6;
+  --accent-foreground: #16332d;
   --destructive: #b42318;
-  --border: #d2c4a8;
-  --input: #d2c4a8;
-  --ring: #c49a2a;
-  --brass: #c49a2a;
+  --border: #b9cdc3;
+  --input: #b9cdc3;
+  --ring: #c9a227;
+  --brass: #c9a227;
   --brass-foreground: #1a2410;
   --forest: #0f3d37;
-  --parchment: #f4efe3;
-  --ink: #142824;
+  --parchment: #eef7f2;
+  --ink: #122824;
   --chart-1: #145248;
-  --chart-2: #c49a2a;
+  --chart-2: #c9a227;
   --chart-3: #2f6f63;
   --chart-4: #8a6a2a;
-  --chart-5: #4d635c;
+  --chart-5: #456058;
   --radius: 0.75rem;
-  --sidebar: #fffaf0;
-  --sidebar-foreground: #142824;
+  --sidebar: #f5faf7;
+  --sidebar-foreground: #122824;
   --sidebar-primary: #145248;
-  --sidebar-primary-foreground: #f7f1e4;
-  --sidebar-accent: #ebe2d0;
-  --sidebar-accent-foreground: #1a332e;
-  --sidebar-border: #d2c4a8;
-  --sidebar-ring: #c49a2a;
+  --sidebar-primary-foreground: #eef7f2;
+  --sidebar-accent: #dce8e1;
+  --sidebar-accent-foreground: #16332d;
+  --sidebar-border: #b9cdc3;
+  --sidebar-ring: #c9a227;
 }
 
 @layer base {
@@ -98,9 +99,9 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(ellipse 80% 50% at 10% -10%, rgb(196 154 42 / 0.12), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 0%, rgb(20 82 72 / 0.1), transparent),
-      linear-gradient(180deg, #f7f2e8 0%, #f4efe3 40%, #ebe4d4 100%);
+      radial-gradient(ellipse 80% 50% at 8% -8%, rgb(201 162 39 / 0.1), transparent),
+      radial-gradient(ellipse 55% 40% at 100% 0%, rgb(20 82 72 / 0.12), transparent),
+      linear-gradient(180deg, #f2f7f4 0%, #e9f0ec 45%, #dfeae4 100%);
     background-attachment: fixed;
   }
   html {

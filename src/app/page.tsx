@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { AppHeader } from "@/components/site-chrome";
 import { HeroTrail } from "@/components/hero-trail";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 
 export default function HomePage() {
   return (
@@ -14,13 +13,13 @@ export default function HomePage() {
           <AppHeader
             tone="light"
             action={
-              <Button
-                render={<Link href="/teacher" />}
+              <LinkButton
+                href="/teacher"
                 className="bg-brass text-brass-foreground hover:bg-brass/90"
                 size="sm"
               >
                 Отвори кабинета
-              </Button>
+              </LinkButton>
             }
           />
 
@@ -37,40 +36,40 @@ export default function HomePage() {
                 маршрута — самостоятелно и с подсказка, когато трябва.
               </p>
               <div className="animate-fade-up-delay-2 mt-8 flex flex-wrap gap-3">
-                <Button
-                  render={<Link href="/teacher" />}
+                <LinkButton
+                  href="/teacher"
                   size="lg"
                   className="bg-brass text-brass-foreground hover:bg-brass/90 h-11 px-5 text-base"
                 >
                   Създай лов
-                </Button>
-                <Button
-                  render={<Link href="/teacher?demo=1" />}
+                </LinkButton>
+                <LinkButton
+                  href="/teacher?demo=1"
                   size="lg"
                   variant="outline"
                   className="h-11 border-parchment/35 bg-transparent px-5 text-base text-parchment hover:bg-parchment/10 hover:text-parchment"
                 >
                   Виж демо лов
-                </Button>
+                </LinkButton>
               </div>
             </div>
           </section>
         </div>
       </main>
 
-      <section className="border-t border-border bg-parchment px-4 py-16 sm:px-10 lg:px-16">
+      <section className="border-t border-white/10 bg-[#0a2f2c] px-4 py-16 text-parchment sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-end">
           <div>
-            <h2 className="font-display text-3xl font-semibold text-forest sm:text-4xl">
+            <h2 className="font-display text-3xl font-semibold text-parchment sm:text-4xl">
               Методическият модел в действие
             </h2>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-parchment/75">
               КЛАД е практическата среда към модела „Лов на съкровища“: независима работа
               по математика чрез физически станции и цифрови задачи. Подходящ за урок,
               занималня или открит урок в 5. клас.
             </p>
           </div>
-          <ol className="space-y-4 text-sm leading-relaxed text-foreground/85">
+          <ol className="space-y-4 text-sm leading-relaxed text-parchment/85">
             <li>
               <span className="font-semibold text-brass">1.</span> Учителят създава маршрут и
               разпечатва QR за всяка станция.
@@ -85,7 +84,7 @@ export default function HomePage() {
             </li>
           </ol>
         </div>
-        <p className="mx-auto mt-12 max-w-5xl text-xs text-muted-foreground">
+        <p className="mx-auto mt-12 max-w-5xl text-xs text-parchment/55">
           Практическа част · магистърска теза на Тони Петкова
         </p>
       </section>

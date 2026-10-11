@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppHeader, PageShell, StatusBlock } from "@/components/site-chrome";
+import { LinkButton } from "@/components/link-button";
 import { Button } from "@/components/ui/button";
 import {
   createEmptyHunt,
@@ -93,9 +93,9 @@ export function TeacherDashboard() {
             action={
               <>
                 <Button onClick={createHunt}>Създай лов</Button>
-                <Button variant="outline" render={<Link href="/teacher/demo_drobi" />}>
+                <LinkButton variant="outline" href="/teacher/demo_drobi">
                   Отвори демо
-                </Button>
+                </LinkButton>
               </>
             }
           />
@@ -127,13 +127,10 @@ export function TeacherDashboard() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button render={<Link href={`/teacher/${hunt.id}`} />}>Редактирай</Button>
-                  <Button
-                    variant="outline"
-                    render={<Link href={`/teacher/${hunt.id}?preview=1`} />}
-                  >
+                  <LinkButton href={`/teacher/${hunt.id}`}>Редактирай</LinkButton>
+                  <LinkButton variant="outline" href={`/teacher/${hunt.id}?preview=1`}>
                     Преглед
-                  </Button>
+                  </LinkButton>
                   <Button
                     variant="ghost"
                     size="icon"

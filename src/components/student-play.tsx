@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { BrandMark, StatusBlock } from "@/components/site-chrome";
+import { LinkButton } from "@/components/link-button";
 import { Button } from "@/components/ui/button";
 import {
   decodeHunt,
@@ -85,9 +85,9 @@ export function StudentPlay() {
           title="Станцията не се отвори"
           description={error ?? "Опитай отново със свеж QR код."}
           action={
-            <Button render={<Link href="/" />} variant="outline">
+            <LinkButton href="/" variant="outline">
               Към началото
-            </Button>
+            </LinkButton>
           }
         />
       </main>
@@ -166,19 +166,15 @@ export function StudentPlay() {
             )}
 
             {!isLast ? (
-              <Button
-                render={
-                  <Link
-                    href={`/play?d=${encodeURIComponent(encoded)}&n=${index + 1}`}
-                  />
-                }
+              <LinkButton
+                href={`/play?d=${encodeURIComponent(encoded)}&n=${index + 1}`}
                 size="lg"
                 variant="secondary"
                 className="h-12 w-full text-base"
               >
                 Към следващата станция
                 <ChevronRight data-icon="inline-end" />
-              </Button>
+              </LinkButton>
             ) : completedHere || justCompleted ? (
               <div className="rounded-2xl bg-forest px-4 py-5 text-center text-parchment">
                 <p className="font-display text-2xl font-semibold">Съкровището е твое</p>

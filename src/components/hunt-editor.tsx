@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader, PageShell, StatusBlock } from "@/components/site-chrome";
+import { LinkButton } from "@/components/link-button";
 import { StationQr } from "@/components/station-qr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -153,7 +153,7 @@ export function HuntEditor({
           title="Ловът липсва"
           description={error ?? "Маршрутът не е запазен на това устройство."}
           action={
-            <Button render={<Link href="/teacher" />}>Към кабинета</Button>
+            <LinkButton href="/teacher">Към кабинета</LinkButton>
           }
         />
       </div>
@@ -411,17 +411,14 @@ export function HuntEditor({
                 </p>
               </div>
               {encoded && stations.length > 0 ? (
-                <Button
-                  render={
-                    <Link
-                      href={`/play?d=${encodeURIComponent(encoded)}&n=0`}
-                      target="_blank"
-                    />
-                  }
+                <LinkButton
+                  href={`/play?d=${encodeURIComponent(encoded)}&n=0`}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   <ExternalLink data-icon="inline-start" />
                   Отвори в нов раздел
-                </Button>
+                </LinkButton>
               ) : null}
             </div>
 
