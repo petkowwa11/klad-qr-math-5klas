@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { BrandMark, StatusBlock } from "@/components/site-chrome";
 import { LinkButton } from "@/components/link-button";
 import { Button } from "@/components/ui/button";
+import { resolvePlayPayload } from "@/lib/curriculum/catalog";
 import {
   decodeHunt,
   loadProgress,
@@ -24,13 +25,32 @@ export function StudentPlay() {
   const [justCompleted, setJustCompleted] = useState(false);
 
   const encoded = searchParams.get("d") ?? "";
+  const catalogId = searchParams.get("c") ?? "";
+  const levelId = searchParams.get("lv") ?? "";
   const rawIndex = searchParams.get("n") ?? "0";
+
+  const nextHref = useMemo(() => {
+    const params = new URLSearchParams();
+    if (catalogId && levelId) {
+      params.set("c", catalogId);
+      params.set("lv", levelId);
+    } else if (encoded) {
+      params.set("d", encoded);
+    }
+    params.set("n", String(index + 1));
+    return `/play?${params.toString()}`;
+  }, [catalogId, encoded, index, levelId]);
 
   useEffect(() => {
     setLoading(true);
     setHintOpen(false);
     setJustCompleted(false);
-    const parsed = decodeHunt(encoded);
+    const fromCatalog = resolvePlayPayload({
+      c: catalogId,
+      lv: levelId,
+      d: encoded,
+    });
+    const parsed = fromCatalog ?? (encoded ? decodeHunt(encoded) : null);
     const nextIndex = Number.parseInt(rawIndex, 10);
     if (!parsed) {
       setHunt(null);
@@ -49,7 +69,7 @@ export function StudentPlay() {
     setDone(loadProgress(parsed.t));
     setError(null);
     setLoading(false);
-  }, [encoded, rawIndex]);
+  }, [catalogId, encoded, levelId, rawIndex]);
 
   const station = hunt?.s[index];
   const isLast = hunt ? index >= hunt.s.length - 1 : true;
@@ -85,8 +105,8 @@ export function StudentPlay() {
           title="Станцията не се отвори"
           description={error ?? "Опитай отново със свеж QR код."}
           action={
-            <LinkButton href="/" variant="outline">
-              Към началото
+            <LinkButton href="/curriculum" variant="outline">
+              Към програмата
             </LinkButton>
           }
         />
@@ -152,7 +172,12 @@ export function StudentPlay() {
 
           <section className="mt-8 space-y-3">
             {!completedHere && !justCompleted ? (
-              <Button type="button" size="lg" className="h-12 w-full text-base" onClick={completeStation}>
+              <Button
+                type="button"
+                size="lg"
+                className="h-12 w-full text-base"
+                onClick={completeStation}
+              >
                 <CheckCircle2 data-icon="inline-start" />
                 Маркирай като решена
               </Button>
@@ -167,7 +192,7 @@ export function StudentPlay() {
 
             {!isLast ? (
               <LinkButton
-                href={`/play?d=${encodeURIComponent(encoded)}&n=${index + 1}`}
+                href={nextHref}
                 size="lg"
                 variant="secondary"
                 className="h-12 w-full text-base"
@@ -179,8 +204,18 @@ export function StudentPlay() {
               <div className="rounded-2xl bg-forest px-4 py-5 text-center text-parchment">
                 <p className="font-display text-2xl font-semibold">Съкровището е твое</p>
                 <p className="mt-2 text-sm text-parchment/80">
-                  Премина през всички станции от „{hunt.t}“. Покажи на учителя какво си решил.
+                  Премина през всички станции от „{hunt.t}“. Покажи на учителя какво си
+                  решил.
                 </p>
+                <div className="mt-4">
+                  <LinkButton
+                    href="/curriculum"
+                    variant="outline"
+                    className="border-parchment/40 bg-transparent text-parchment hover:bg-parchment/10 hover:text-parchment"
+                  >
+                    Избери следващ урок
+                  </LinkButton>
+                </div>
               </div>
             ) : null}
           </section>

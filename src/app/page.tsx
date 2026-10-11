@@ -37,19 +37,19 @@ export default function HomePage() {
               </p>
               <div className="animate-fade-up-delay-2 mt-8 flex flex-wrap gap-3">
                 <LinkButton
-                  href="/teacher"
+                  href="/curriculum"
                   size="lg"
                   className="bg-brass text-brass-foreground hover:bg-brass/90 h-11 px-5 text-base"
                 >
-                  Създай лов
+                  Учебна програма
                 </LinkButton>
                 <LinkButton
-                  href="/teacher?demo=1"
+                  href="/curriculum/l-frac-3"
                   size="lg"
                   variant="outline"
                   className="h-11 border-parchment/35 bg-transparent px-5 text-base text-parchment hover:bg-parchment/10 hover:text-parchment"
                 >
-                  Виж демо лов
+                  Пример: дроби
                 </LinkButton>
               </div>
             </div>
@@ -71,16 +71,16 @@ export default function HomePage() {
           </div>
           <ol className="space-y-4 text-sm leading-relaxed text-parchment/85">
             <li>
-              <span className="font-semibold text-brass">1.</span> Учителят създава маршрут и
-              разпечатва QR за всяка станция.
+              <span className="font-semibold text-brass">1.</span> Избери урок от програмата
+              за 5. клас и ниво (лесно → трудно).
             </li>
             <li>
-              <span className="font-semibold text-brass">2.</span> Ученикът сканира, решава и
-              ползва подсказка само ако се затрудни.
+              <span className="font-semibold text-brass">2.</span> Разпечатай QR станциите —
+              ученикът сканира, решава и ползва подсказка при нужда.
             </li>
             <li>
               <span className="font-semibold text-brass">3.</span> Следващата станция води
-              напред по „съкровищния“ маршрут до финала.
+              напред по маршрута; цялата година е покрита урок по урок.
             </li>
           </ol>
         </div>

@@ -47,9 +47,18 @@ export function AppHeader({
       <BrandMark tone={tone} />
       <nav className="flex items-center gap-2 sm:gap-3">
         <Link
-          href="/teacher"
+          href="/curriculum"
           className={cn(
             "text-sm font-medium underline-offset-4 transition hover:underline",
+            tone === "light" ? "text-parchment/85" : "text-foreground/80",
+          )}
+        >
+          Програма
+        </Link>
+        <Link
+          href="/teacher"
+          className={cn(
+            "hidden text-sm font-medium underline-offset-4 transition hover:underline sm:inline",
             tone === "light" ? "text-parchment/85" : "text-foreground/80",
           )}
         >

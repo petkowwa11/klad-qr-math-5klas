@@ -70,9 +70,14 @@ export function TeacherDashboard() {
             Твоите ловни маршрути
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Създай станции с математически задачи, подреди ги и разпечатай QR кодовете.
-            Учениците сканират от телефона — без профили и без сървър.
+            Тук пазиш собствени ловни маршрути. За пълната учебна година (уроци, нива и
+            готови станции) отвори програмата.
           </p>
+          <div className="mt-5">
+            <LinkButton href="/curriculum" variant="outline">
+              Към учебната програма (5. клас)
+            </LinkButton>
+          </div>
         </div>
 
         {error ? (
