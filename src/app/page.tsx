@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/site-chrome";
 import { HeroTrail } from "@/components/hero-trail";
+import { LandingEntryQrs } from "@/components/landing-entry-qrs";
 import { LinkButton } from "@/components/link-button";
 
 export default function HomePage() {
@@ -14,79 +15,56 @@ export default function HomePage() {
             tone="light"
             action={
               <LinkButton
-                href="/teacher"
+                href="/login/teacher"
                 className="bg-brass text-brass-foreground hover:bg-brass/90"
                 size="sm"
               >
-                Отвори кабинета
+                Вход учител
               </LinkButton>
             }
           />
 
-          <section className="flex flex-1 flex-col justify-end px-4 pb-14 pt-10 sm:justify-center sm:px-10 sm:pb-20 lg:px-16">
-            <div className="max-w-xl">
+          <section className="flex flex-1 flex-col justify-center px-4 pb-12 pt-6 sm:px-10 lg:px-16">
+            <div className="max-w-2xl">
               <p className="animate-fade-up font-display text-5xl font-semibold tracking-tight text-parchment sm:text-7xl">
                 КЛАД
               </p>
-              <h1 className="animate-fade-up-delay mt-5 max-w-[18ch] font-display text-2xl font-medium leading-snug text-parchment sm:text-4xl">
-                Лов на съкровища с QR за математика в 5. клас
+              <h1 className="animate-fade-up-delay mt-4 max-w-[20ch] font-display text-2xl font-medium leading-snug text-parchment sm:text-4xl">
+                Сканирай QR и влез в лова
               </h1>
-              <p className="animate-fade-up-delay-2 mt-4 max-w-[36ch] text-base leading-relaxed text-parchment/80 sm:text-lg">
-                Учителят нарежда станциите. Ученикът сканира, решава и продължава по
-                маршрута — самостоятелно и с подсказка, когато трябва.
+              <p className="animate-fade-up-delay-2 mt-3 max-w-[38ch] text-base leading-relaxed text-parchment/80 sm:text-lg">
+                Два входа за класната стая — ученици и учители. Математика за 5. клас
+                през станции със съкровища.
               </p>
-              <div className="animate-fade-up-delay-2 mt-8 flex flex-wrap gap-3">
-                <LinkButton
-                  href="/curriculum"
-                  size="lg"
-                  className="bg-brass text-brass-foreground hover:bg-brass/90 h-11 px-5 text-base"
-                >
-                  Учебна програма
-                </LinkButton>
-                <LinkButton
-                  href="/curriculum/l-frac-3"
-                  size="lg"
-                  variant="outline"
-                  className="h-11 border-parchment/35 bg-transparent px-5 text-base text-parchment hover:bg-parchment/10 hover:text-parchment"
-                >
-                  Пример: дроби
-                </LinkButton>
-              </div>
+              <LandingEntryQrs />
             </div>
           </section>
         </div>
       </main>
 
-      <section className="border-t border-white/10 bg-[#0a2f2c] px-4 py-16 text-parchment sm:px-10 lg:px-16">
-        <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-end">
-          <div>
-            <h2 className="font-display text-3xl font-semibold text-parchment sm:text-4xl">
-              Методическият модел в действие
-            </h2>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-parchment/75">
-              КЛАД е практическата среда към модела „Лов на съкровища“: независима работа
-              по математика чрез физически станции и цифрови задачи. Подходящ за урок,
-              занималня или открит урок в 5. клас.
-            </p>
-          </div>
-          <ol className="space-y-4 text-sm leading-relaxed text-parchment/85">
+      <section className="border-t border-white/10 bg-[#0a2f2c] px-4 py-14 text-parchment sm:px-10 lg:px-16">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="font-display text-3xl font-semibold text-parchment">
+            Как работи
+          </h2>
+          <ol className="mt-6 grid gap-4 text-sm leading-relaxed text-parchment/85 md:grid-cols-3">
             <li>
-              <span className="font-semibold text-brass">1.</span> Избери урок от програмата
-              за 5. клас и ниво (лесно → трудно).
+              <span className="font-semibold text-brass">1.</span> Ученикът сканира QR
+              „Ученици“, избира паралелка и номер в класа.
             </li>
             <li>
-              <span className="font-semibold text-brass">2.</span> Разпечатай QR станциите —
-              ученикът сканира, решава и ползва подсказка при нужда.
+              <span className="font-semibold text-brass">2.</span> Решава станции от
+              учебната програма; отговорите се проверяват и напредъкът се записва.
             </li>
             <li>
-              <span className="font-semibold text-brass">3.</span> Следващата станция води
-              напред по маршрута; цялата година е покрита урок по урок.
+              <span className="font-semibold text-brass">3.</span> Учителят влиза през
+              своя QR и вижда къде класът има пропуски.
             </li>
           </ol>
+          <p className="mt-10 text-xs text-parchment/55">
+            Практическа част · магистърска теза на Тони Петкова
+          </p>
         </div>
-        <p className="mx-auto mt-12 max-w-5xl text-xs text-parchment/55">
-          Практическа част · магистърска теза на Тони Петкова
-        </p>
       </section>
     </div>
   );

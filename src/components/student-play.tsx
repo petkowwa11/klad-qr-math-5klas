@@ -18,6 +18,25 @@ import {
 } from "@/lib/hunt";
 import { CheckCircle2, ChevronRight, Lightbulb, MapPinned } from "lucide-react";
 
+type AuthMe = {
+  role: "teacher" | "student" | null;
+  studentId?: string | null;
+};
+
+async function saveDbProgress(payload: {
+  lessonId: string;
+  levelId: string;
+  stationIndex: number;
+  status: "correct" | "wrong" | "incomplete";
+  wrongTries: number;
+}) {
+  await fetch("/api/progress", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
 export function StudentPlay() {
   const searchParams = useSearchParams();
   const [hunt, setHunt] = useState<ShareableHunt | null>(null);
@@ -30,6 +49,7 @@ export function StudentPlay() {
   const [wrongTries, setWrongTries] = useState(0);
   const [feedback, setFeedback] = useState<"idle" | "correct" | "wrong">("idle");
   const [revealed, setRevealed] = useState(false);
+  const [authedStudent, setAuthedStudent] = useState(false);
   const previewMode = searchParams.get("preview") === "1";
 
   const encoded = searchParams.get("d") ?? "";
@@ -51,36 +71,85 @@ export function StudentPlay() {
   }, [catalogId, encoded, index, levelId, previewMode]);
 
   useEffect(() => {
-    setLoading(true);
-    setHintOpen(false);
-    setAnswer("");
-    setWrongTries(0);
-    setFeedback("idle");
-    setRevealed(false);
-    const fromCatalog = resolvePlayPayload({
-      c: catalogId,
-      lv: levelId,
-      d: encoded,
-    });
-    const parsed = fromCatalog ?? (encoded ? decodeHunt(encoded) : null);
-    const nextIndex = Number.parseInt(rawIndex, 10);
-    if (!parsed) {
-      setHunt(null);
-      setError("QR връзката е повредена или непълна. Попитай учителя за нов код.");
-      setLoading(false);
-      return;
+    let cancelled = false;
+    async function boot() {
+      setLoading(true);
+      setHintOpen(false);
+      setAnswer("");
+      setWrongTries(0);
+      setFeedback("idle");
+      setRevealed(false);
+
+      const meRes = await fetch("/api/auth/me");
+      const me = (await meRes.json()) as AuthMe;
+      const isStudent = me.role === "student" && Boolean(me.studentId);
+      if (!cancelled) setAuthedStudent(isStudent);
+
+      const fromCatalog = resolvePlayPayload({
+        c: catalogId,
+        lv: levelId,
+        d: encoded,
+      });
+      const parsed = fromCatalog ?? (encoded ? decodeHunt(encoded) : null);
+      const nextIndex = Number.parseInt(rawIndex, 10);
+      if (!parsed) {
+        if (!cancelled) {
+          setHunt(null);
+          setError("QR връзката е повредена или непълна. Попитай учителя за нов код.");
+          setLoading(false);
+        }
+        return;
+      }
+      if (!Number.isFinite(nextIndex) || nextIndex < 0 || nextIndex >= parsed.s.length) {
+        if (!cancelled) {
+          setHunt(parsed);
+          setError("Тази станция не съществува в маршрута.");
+          setLoading(false);
+        }
+        return;
+      }
+
+      let doneIndexes = loadProgress(parsed.t);
+      let stationWrong = 0;
+      let alreadyCorrect = false;
+
+      if (isStudent && catalogId && levelId) {
+        const progRes = await fetch(
+          `/api/progress?lessonId=${encodeURIComponent(catalogId)}&levelId=${encodeURIComponent(levelId)}`,
+        );
+        if (progRes.ok) {
+          const data = (await progRes.json()) as {
+            progress: Array<{
+              stationIndex: number;
+              status: string;
+              wrongTries: number;
+            }>;
+          };
+          doneIndexes = data.progress
+            .filter((row) => row.status === "correct")
+            .map((row) => row.stationIndex);
+          const current = data.progress.find((row) => row.stationIndex === nextIndex);
+          if (current) {
+            stationWrong = current.wrongTries;
+            alreadyCorrect = current.status === "correct";
+          }
+        }
+      }
+
+      if (!cancelled) {
+        setHunt(parsed);
+        setIndex(nextIndex);
+        setDone(doneIndexes);
+        setWrongTries(stationWrong);
+        setFeedback(alreadyCorrect ? "correct" : "idle");
+        setError(null);
+        setLoading(false);
+      }
     }
-    if (!Number.isFinite(nextIndex) || nextIndex < 0 || nextIndex >= parsed.s.length) {
-      setHunt(parsed);
-      setError("Тази станция не съществува в маршрута.");
-      setLoading(false);
-      return;
-    }
-    setHunt(parsed);
-    setIndex(nextIndex);
-    setDone(loadProgress(parsed.t));
-    setError(null);
-    setLoading(false);
+    void boot();
+    return () => {
+      cancelled = true;
+    };
   }, [catalogId, encoded, levelId, rawIndex]);
 
   const station = hunt?.s[index];
@@ -94,7 +163,21 @@ export function StudentPlay() {
     return `${count} / ${hunt.s.length} станции`;
   }, [done, feedback, hunt, index]);
 
-  function submitAnswer() {
+  async function persist(
+    status: "correct" | "wrong" | "incomplete",
+    tries: number,
+  ) {
+    if (!authedStudent || !catalogId || !levelId) return;
+    await saveDbProgress({
+      lessonId: catalogId,
+      levelId,
+      stationIndex: index,
+      status,
+      wrongTries: tries,
+    });
+  }
+
+  async function submitAnswer() {
     if (!hunt || !station) return;
     if (accepted.length === 0) {
       setFeedback("wrong");
@@ -104,16 +187,20 @@ export function StudentPlay() {
       setFeedback("correct");
       setDone(markStationDone(hunt.t, index));
       setRevealed(false);
+      await persist("correct", wrongTries);
       return;
     }
+    const nextWrong = wrongTries + 1;
     setFeedback("wrong");
-    setWrongTries((n) => n + 1);
+    setWrongTries(nextWrong);
+    await persist("wrong", nextWrong);
   }
 
-  function previewSkip() {
+  async function previewSkip() {
     if (!hunt || !previewMode) return;
     setFeedback("correct");
     setDone(markStationDone(hunt.t, index));
+    await persist("correct", wrongTries);
   }
 
   if (loading) {
@@ -135,8 +222,8 @@ export function StudentPlay() {
           title="Станцията не се отвори"
           description={error ?? "Опитай отново със свеж QR код."}
           action={
-            <LinkButton href="/curriculum" variant="outline">
-              Към програмата
+            <LinkButton href="/portal/student" variant="outline">
+              Към портала
             </LinkButton>
           }
         />
@@ -214,7 +301,7 @@ export function StudentPlay() {
                     if (feedback !== "idle") setFeedback("idle");
                   }}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") submitAnswer();
+                    if (e.key === "Enter") void submitAnswer();
                   }}
                   placeholder="Напр. 3/4 или 0,75"
                   className="h-12 bg-background text-base"
@@ -225,7 +312,7 @@ export function StudentPlay() {
                   type="button"
                   size="lg"
                   className="h-12 w-full text-base"
-                  onClick={submitAnswer}
+                  onClick={() => void submitAnswer()}
                   disabled={!answer.trim()}
                 >
                   <CheckCircle2 data-icon="inline-start" />
@@ -266,7 +353,7 @@ export function StudentPlay() {
                     variant="ghost"
                     size="sm"
                     className="w-full text-muted-foreground"
-                    onClick={previewSkip}
+                    onClick={() => void previewSkip()}
                   >
                     Преглед: отбележи като решена
                   </Button>
@@ -297,26 +384,21 @@ export function StudentPlay() {
               <div className="rounded-2xl bg-forest px-4 py-5 text-center text-parchment">
                 <p className="font-display text-2xl font-semibold">Съкровището е твое</p>
                 <p className="mt-2 text-sm text-parchment/80">
-                  Премина през всички станции от „{hunt.t}“. Покажи на учителя какво си
-                  решил.
+                  Премина през всички станции от „{hunt.t}“.
                 </p>
                 <div className="mt-4">
                   <LinkButton
-                    href="/curriculum"
+                    href="/portal/student"
                     variant="outline"
                     className="border-parchment/40 bg-transparent text-parchment hover:bg-parchment/10 hover:text-parchment"
                   >
-                    Избери следващ урок
+                    Към портала
                   </LinkButton>
                 </div>
               </div>
             ) : null}
           </section>
         </div>
-
-        <p className="mt-6 text-center text-xs text-muted-foreground animate-fade-up-delay-2">
-          Ако си на физическа станция — остави телефона и тръгни към следващия QR.
-        </p>
       </div>
     </main>
   );

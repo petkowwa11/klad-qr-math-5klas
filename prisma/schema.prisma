@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Teacher {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  passwordHash String
+  name         String
+  classes      ClassGroup[]
+  createdAt    DateTime     @default(now())
+}
+
+model ClassGroup {
+  id        String    @id @default(cuid())
+  grade     Int
+  parallel  String
+  teacherId String
+  teacher   Teacher   @relation(fields: [teacherId], references: [id])
+  students  Student[]
+
+  @@unique([grade, parallel])
+}
+
+model Student {
+  id           String            @id @default(cuid())
+  classGroupId String
+  classNumber  Int
+  name         String
+  passwordHash String
+  classGroup   ClassGroup        @relation(fields: [classGroupId], references: [id])
+  progress     StationProgress[]
+
+  @@unique([classGroupId, classNumber])
+}
+
+model StationProgress {
+  id           String   @id @default(cuid())
+  studentId    String
+  lessonId     String
+  levelId      String
+  stationIndex Int
+  status       String
+  wrongTries   Int      @default(0)
+  updatedAt    DateTime @updatedAt
+  student      Student  @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, lessonId, levelId, stationIndex])
+  @@index([studentId])
+}
